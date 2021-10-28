@@ -14,3 +14,4 @@ En el Script "Plots_Salida" por su parte solo se emplean los algoritmos desarrol
 
 En el siguiente esquema se muestra cómo se diagramó el procesamiento de la señal radar,
 
+[My image](https://github.com/pdlsantos/PrimerLaboLPDS/blob/main/EsquemaProceso.png)
