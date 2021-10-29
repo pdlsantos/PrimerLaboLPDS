@@ -137,9 +137,14 @@ Ym3 = Ym3[:np.size(rango),:]
 Yf = fun.STI2(y,h)
 Yf = Yf[:np.size(rango),:]
 
+Ydoppler = fun.filtroDoppler2(Y_adapt)
+Ydoppler = Ydoppler[:np.size(rango),:]
+
+YCFARDoppler = fun.CFAR(1e-6, 20, SNR[0], Ydoppler, Guarda = 3)
 YCFARm = fun.CFAR(1e-6, 20, SNR[0], Ym, Guarda = 3)
 YCFARm3 = fun.CFAR(1e-6,30, SNR[0], Ym3, Guarda = 3)
 YCFARf = fun.CFAR(1e-6, 20, SNR[0], Yf, Guarda = 3)
+
 
 ym_det = fun.Detector(Ym, YCFARm, integBinaria = True, cant = 1)
 ym3_det = fun.Detector(Ym3, YCFARm3, integBinaria = True, cant = 1)
@@ -199,7 +204,7 @@ plt.ylim(0,2e4)
 plt.xlim(4,6)
 plt.legend(loc = 'best')
 plt.xlabel('Rango [km]')
-plt.ylabel('Potencia [W]')
+plt.ylabel('Potencia')
 plt.savefig('Images/SalidaUmbral2pulsos5km' +".png")
 plt.show()
 
@@ -265,4 +270,46 @@ plt.ylabel("Rango [km]")
 plt.xlabel("Número de Salida del Filtro")
 plt.tight_layout()
 plt.savefig('Images/DeteccionesConFiltro3Pulsos' + ".png")
+plt.show()
+
+# Filtro Doppler
+
+
+
+sh1 = Ydoppler.shape[0]
+sh2 = Ydoppler.shape[1]
+Ydoppler = np.abs(Ydoppler)*np.abs(Ydoppler)
+output = np.zeros((sh1,sh2), dtype = np.complex128)
+vel =fun.velocidad(PRF[0], fc[0], sh2)
+
+
+for r in range(sh1):
+    for l in range(sh2):
+        output[r,l] = 1 if Ydoppler[r, l] > YCFARDoppler[r, l] else 0
+        
+fs = 14
+plt.contourf(vel-9, rango, np.fft.fftshift(output, axes = 1), cmap="gray", levels=50)
+#plt.contourf(np.arange(1,9), rango, np.abs(Ym3), cmap="gray", levels=50)
+cbar = plt.colorbar()
+# cbar.set_label(r"$|h_0|^2$")
+cbar.ax.tick_params(labelsize = fs)
+# plt.contour(px, py, h, colors="black")
+plt.ylabel("Rango [km]")
+plt.xlabel("Velocidad [m/s]")
+plt.tight_layout()
+plt.savefig('Images/DetectorFiltroDoppler' + ".png")
+plt.show()
+
+
+fs = 14
+plt.contourf(vel-9, rango, np.fft.fftshift(np.abs(Ydoppler), axes = 1), levels=50)
+#plt.contourf(np.arange(1,9), rango, np.abs(Ym3), cmap="gray", levels=50)
+cbar = plt.colorbar()
+# cbar.set_label(r"$|h_0|^2$")
+cbar.ax.tick_params(labelsize = fs)
+# plt.contour(px, py, h, colors="black")
+plt.ylabel("Rango [km]")
+plt.xlabel("Velocidad [m/s]")
+plt.tight_layout()
+plt.savefig('Images/FiltroDoppler' + ".png")
 plt.show()
